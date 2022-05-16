@@ -217,7 +217,4 @@ public class MoguraController : MonoBehaviour
         anime.SetBool("ue", false);
         anime.SetBool("sita", false);
     }
-
 }
-
-
