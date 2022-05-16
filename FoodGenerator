@@ -1,0 +1,74 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class FoodGenerator : MonoBehaviour
+{
+    bool Rock = false;//岩に触れているかどうか
+    float rnd_sil;//食べものが出現するかの確率
+    int rnd_food;//どの食べ物が出現するかの確率
+
+    public GameObject Cherry_sil;//さくらんぼ
+    public GameObject Cookie_sil;//クッキー
+    public GameObject Lemon_sil;//レモン
+    public GameObject Melon_sil;//メロン
+    public GameObject Choco_sil;//チョコ
+    public GameObject Bread_sil;//パン
+    public GameObject Tomato_sil;//トマト
+
+    void Start()
+    {
+        //岩やギミックにふれていたら無効にする
+        if (Rock == true)
+        {
+            return;
+        }
+        rnd_sil = Random.Range(0, 100);
+    }
+
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        //岩やギミックに触れていたら無効にする
+        if(col.gameObject.tag=="rock"|| col.gameObject.tag == "apple" 
+            || col.gameObject.tag == "hole1" || col.gameObject.tag == "hole2")
+        {
+            Rock = true;
+        }
+
+        if (col.gameObject.tag=="hana"&&Rock==false)//鼻の範囲に触れたら
+        {
+            if ((int)rnd_sil <= (ChildCount.Child) * 0.05f)//背景の土の数だけ出る確率を高くする
+            {
+                rnd_food = Random.Range(1, 101);
+                if (rnd_food <= 30)//30%でさくらんぼが出現
+                {
+                    Cherry_sil.SetActive(true);
+                }
+                else if (31 <= rnd_food && rnd_food <= 51)//20％でクッキーが出現
+                {
+                    Cookie_sil.SetActive(true);
+                }
+                else if (52 <= rnd_food && rnd_food <= 69)//17％でレモンが出現
+                {
+                    Lemon_sil.SetActive(true);
+                }
+                else if (70 <= rnd_food && rnd_food <= 82)//12％でメロンが出現
+                {
+                    Melon_sil.SetActive(true);
+                }
+                else if (83 <= rnd_food && rnd_food <= 92)//9％でチョコが出現
+                {
+                    Choco_sil.SetActive(true);
+                }
+                else if (93 <= rnd_food && rnd_food <= 97)//4％でパンが出現
+                {
+                    Bread_sil.SetActive(true);
+                }
+                else if (98 <= rnd_food && rnd_food <= 100)//2％でトマトが出現
+                {
+                    Tomato_sil.SetActive(true);
+                }
+            }
+        }
+    }
+}
