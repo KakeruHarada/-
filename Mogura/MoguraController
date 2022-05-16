@@ -1,0 +1,223 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MoguraController : MonoBehaviour
+{
+    public AudioSource WalkSource;//歩く音
+    public AudioClip WalkClip;
+    public AudioSource RockHitSource;//岩にぶつかった音
+    public AudioClip RockHitClip;
+    float Loop = 0;//歩く音をループさせる値
+
+
+    public GameObject Clear;//クリアオブジェクト
+    public GameObject MgmgAnimation;//もぐもぐアニメーション
+    public GameObject AtackAnimation;//攻撃アニメーション
+    public GameObject HanaAnimation;//鼻アニメーション
+    public GameObject MimiAnimation;//耳アニメーション
+    Animator anime;
+    // 移動速度
+    public Vector2 SPEED = new Vector2(0.05f, 0.05f);
+
+    public static int way = 1;//モグラの左右方向の取得（0は左、1は右）
+    int Mode = 1;//モグラの能力
+
+    void Start()
+    {
+        // Animator取得
+        anime = GetComponent<Animator>();
+    }
+
+    void FixedUpdate()
+    {
+        Move();// 移動処理
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            Mode = 1;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            Mode = 2;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            Mode = 3;
+        }
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            if (Mode == 1)//攻撃モード
+            {
+                if (appleGauge.AppleCount >= 2)//りんごゲージ2以上の時
+                {
+                    //攻撃アニメーションをプレイヤーと同じ位置にして出現させる
+                    AttackAnimation.transform.position = gameObject.transform.position;
+                    AttackAnimation.SetActive(true);
+                    gameObject.SetActive(false);
+                    appleGauge.AppleCount -= 2;//りんごゲージ2消費
+                }
+            }
+            if (Mode == 2)//鼻モード
+            {
+                if (appleGauge.AppleCount >= 1)//りんごゲージ1以上の時
+                {
+                    //鼻アニメーションをプレイヤーと同じ位置にして出現させる
+                    HanaAnimation.transform.position = gameObject.transform.position;
+                    HanaAnimation.SetActive(true);
+                    gameObject.SetActive(false);
+                    appleGauge.AppleCount -= 1;//りんごゲージ1消費
+                }
+            }
+            if (Mode == 3)//耳モード
+            {
+                if (appleGauge.AppleCount >= 5)//りんごゲージ5以上の時
+                {
+                    //耳アニメーションをプレイヤーと同じ位置にして出現させる
+                    MimiAnimation.transform.position = gameObject.transform.position;
+                    MimiAnimation.SetActive(true);
+                    gameObject.SetActive(false);
+                    appleGauge.AppleCount -= 5;//りんごゲージ5消費
+                }
+            }
+        }
+    }
+
+    // 移動関数
+    void Move()
+    {
+        // 現在位置をPositionに代入
+        Vector2 Position = transform.position;
+        
+        // 左キーを押し続けていたら
+        if (Input.GetKey("left")||Input.GetKey(KeyCode.A))
+        {
+            Loop += 1f*Time.deltaTime;
+            if(Loop>=1)//Loopが1以上になったら
+            {
+                WalkSource.PlayOneShot(WalkClip); //歩く音を鳴らす
+                Loop = 0;//Loopをリセット
+            }
+
+            //左右方向に歩くアニメーションを再生させる
+            anime.SetBool("sayuu", true);
+            anime.SetBool("idle", false);
+            anime.SetBool("ue", false);
+            anime.SetBool("sita", false);
+            
+            // 代入したPositionに対して加算減算を行う
+            Position.x -= SPEED.x;
+            transform.localScale = new Vector3(-1, 1, 1);
+            way = -1;//左向きを取得
+        }
+        // 右キーを押し続けていたら
+        else if (Input.GetKey("right") || Input.GetKey(KeyCode.D))
+        {
+            Loop += 1f * Time.deltaTime;//Loopが1以上になったら
+            if (Loop >= 1)
+            {
+                WalkSource.PlayOneShot(WalkClip);//歩く音を鳴らす
+                Loop = 0;//Loopをリセット
+            }
+
+            //左右方向に歩くアニメーションを再生させる
+            anime.SetBool("sayuu", true);
+            anime.SetBool("idle", false);
+            anime.SetBool("ue", false);
+            anime.SetBool("sita", false);
+
+            // 代入したPositionに対して加算減算を行う
+            Position.x += SPEED.x;
+            transform.localScale = new Vector3(1, 1, 1);
+            way = 1;//右向きを取得
+        }
+        // 上キーを押し続けていたら
+        else if (Input.GetKey("up") || Input.GetKey(KeyCode.W))
+        {
+            Loop += 1f * Time.deltaTime;
+            if (Loop >= 1)//Loopが1以上になったら
+            {
+                WalkSource.PlayOneShot(WalkClip);//歩く音を鳴らす
+                Loop = 0;//Loopをリセット
+            }
+
+            //上方向に歩くアニメーションを再生させる
+            anime.SetBool("sayuu", false);
+            anime.SetBool("idle", false);
+            anime.SetBool("ue", true);
+            anime.SetBool("sita", false);
+            // 代入したPositionに対して加算減算を行う
+            Position.y += SPEED.y;
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        // 下キーを押し続けていたら
+        else if (Input.GetKey("down") || Input.GetKey(KeyCode.S))
+        {
+            Loop += 1f * Time.deltaTime; //Loopが1以上になったら
+            if (Loop >= 1)
+            {
+                WalkSource.PlayOneShot(WalkClip);//歩く音を鳴らす
+                Loop = 0;//Loopをリセット
+            }
+
+            //下方向に歩くアニメーションを再生させる
+            anime.SetBool("sayuu", false);
+            anime.SetBool("idle", false);
+            anime.SetBool("ue", false);
+            anime.SetBool("sita", true);
+            // 代入したPositionに対して加算減算を行う
+            Position.y -= SPEED.y;
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        // 上キーを離したら
+        else if (Input.GetKeyUp("up") || Input.GetKeyUp(KeyCode.W))
+        {
+            //アイドルアニメーションを再生する
+            anime.SetBool("sayuu", false);
+            anime.SetBool("idle", true);
+            anime.SetBool("ue", false);
+            anime.SetBool("sita", false);
+            //大きさと向きを初期化
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        else
+        {
+            //アイドルアニメーションを再生する
+            anime.SetBool("sayuu", false);
+            anime.SetBool("idle", true);
+            anime.SetBool("ue", false);
+            anime.SetBool("sita", false);
+        }
+        // 現在の位置に加算減算を行ったPositionを代入する
+        transform.position = Position;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        //クリアに触れたら
+        if (collision.gameObject.tag == "clear")
+        {
+            Clear.SetActive(true);
+            gameObject.SetActive(false);
+        }
+        //りんごに触れたら
+        if(collision.gameObject.tag=="apple")
+        {
+            MgmgAnimation.SetActive(true);
+            gameObject.SetActive(false);
+        }
+        //岩に触れたら
+        if(collision.gameObject.tag=="rock")
+        {
+            RockHitSource.PlayOneShot(RockHitClip);
+        }
+        //アイドルアニメーションを再生する
+        anime.SetBool("sayuu", false);
+        anime.SetBool("idle", true);
+        anime.SetBool("ue", false);
+        anime.SetBool("sita", false);
+    }
+
+}
+
+
